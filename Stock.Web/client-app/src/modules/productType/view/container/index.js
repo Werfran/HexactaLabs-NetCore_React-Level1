@@ -5,14 +5,14 @@ import { Route } from "react-router-dom";
 import { connect } from "react-redux";
 import { getProductTypeById } from "../../list/index";
 import Presentation from "../presentation";
-//import Remove from "../../remove/container";
+import Remove from "../../remove/container";
 
 export class ProductTypeViewPage extends Component {
   render() {
     return (
       <React.Fragment>
         <Presentation productType={this.props.productType} {...this.props} />
-        {/*<Route path="/productType/view/:id/remove" component={Remove} />*/}
+        <Route path="/productType/view/:id/remove" component={Remove} />
       </React.Fragment>
     );
   }

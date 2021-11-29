@@ -6,9 +6,11 @@ import { push } from "connected-react-router";
 import { getProductTypes, getAll, fetchByFilters } from "../index";
 
 const initialState = {
-  name: "",
-  address: "",
-  condition: "AND",
+  filters: {
+    initials: "",
+    description: "",
+    condition: "AND",
+  },
 };
 
 class ProductTypePage extends React.Component {
@@ -17,17 +19,12 @@ class ProductTypePage extends React.Component {
     this.state = { ...initialState };
   }
 
-  onFilterChange = (event) => {
-    this.setState({ [event.target.name]: event.target.value });
-  };
-
-  onFilterSubmit = () => {
-    this.props.fetchByFilters(this.state);
-  };
-
-  onFilterReset = () => {
-    this.setState({ ...initialState });
-    this.props.getAll();
+  filterChanged = (event) => {
+    const newFilters = {
+      ...this.state.filters,
+      [event.target.name]: event.target.value,
+    };
+    this.setState({ filters: newFilters });
   };
 
   render() {
@@ -37,10 +34,10 @@ class ProductTypePage extends React.Component {
         data={productTypes}
         dataLoading={loading}
         defaultPageSize={5}
-        filters={this.state}
-        onFilterChange={this.onFilterChange}
-        onFilterSubmit={this.onFilterSubmit}
-        clearFilter={this.onFilterReset}
+        filters={this.state.filters}
+        handleFilter={this.filterChanged}
+        submitFilter={() => this.props.fetchByFilters(this.state.filters)}
+        clearFilter={this.props.getAll}
         {...rest}
       />
     );

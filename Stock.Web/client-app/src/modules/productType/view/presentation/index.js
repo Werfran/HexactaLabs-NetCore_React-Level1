@@ -5,10 +5,10 @@ import { Container, Row, Col, Button } from "reactstrap";
 const ProductTypeView = (props) => {
   return (
     <Container fluid>
-      <h1>{props.productType.initial}</h1>
+      <h1>{props.productType.initials}</h1>
       <Row>
         <Col lg="2">Initials</Col>
-        <Col>{props.productType.Initials}</Col>
+        <Col>{props.productType.initials}</Col>
       </Row>
       <Row>
         <Col lg="2">Descripción</Col>

@@ -1,10 +1,12 @@
+import { cloneDeep, pickBy } from "lodash";
+import { normalize } from "../../../common/helpers/normalizer";
 import api from "../../../common/api";
-import { pickBy } from "lodash";
 import { apiErrorToast } from "../../../common/api/apiErrorToast";
 
 const initialState = {
   loading: false,
-  productTypes: [],
+  ids: [],
+  byId: {},
 };
 
 /* Action types */
@@ -31,33 +33,43 @@ function handleLoading(state, { loading }) {
   };
 }
 
-function handleSet(state, { productType }) {
+function handleSet(state, { productTypes }) {
   return {
     ...state,
-    productType,
+    ids: productTypes.map((productType) => productType.id),
+    byId: normalize(productTypes),
   };
 }
 
 function handleNewProductType(state, { productType }) {
   return {
     ...state,
-    productTypes: state.productTypes.concat(productType),
+    ids: state.ids.concat([productType.id]),
+    byId: {
+      ...state.byId,
+      [productType.id]: cloneDeep(productType),
+    },
   };
 }
 
 function handleUpdateProductType(state, { productType }) {
   return {
     ...state,
-    productTypes: state.productTypes.map((p) =>
-      p.id === productType.id ? productType : p
-    ),
+    byId: { ...state.byId, [productType.id]: cloneDeep(productType) },
   };
 }
 
 function handleRemoveProductType(state, { id }) {
   return {
     ...state,
-    productTypes: state.productTypes.filter((p) => p.id !== id),
+    ids: state.ids.filter((productTypeId) => productTypeId !== id),
+    byId: Object.keys(state.byId).reduce(
+      (acc, productTypeId) =>
+        productTypeId !== `${id}`
+          ? { ...acc, [productTypeId]: state.byId[productTypeId] }
+          : acc,
+      {}
+    ),
   };
 }
 
@@ -131,10 +143,29 @@ export function getLoading(state) {
   return base(state).loading;
 }
 
-export function getProductTypes(state) {
-  return base(state).productTypes;
+export function getProductTypeById(state) {
+  return base(state).byId;
 }
 
-export function getProductTypeById(state, id) {
-  return getProductTypes(state).find((p) => p.id === id);
+export function getProductTypeIds(state) {
+  return base(state).ids;
 }
+
+export function getProductTypesById(state, id) {
+  return getProductTypeById(state)[id] || {};
+}
+
+function makeGetProductTypesMemoized() {
+  let cache;
+  let value = [];
+  return (state) => {
+    if (cache === getProductTypesById(state)) {
+      return value;
+    }
+    cache = getProductTypesById(state);
+    value = Object.values(getProductTypesById(state));
+    return value;
+  };
+}
+
+export const getProductTypes = makeGetProductTypesMemoized();

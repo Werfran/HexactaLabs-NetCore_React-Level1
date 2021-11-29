@@ -22,7 +22,7 @@ export function remove(id) {
   return function (dispatch) {
     dispatch(setLoading(true));
     return api
-      .delete(`/producttype/${id}`)
+      .delete(`/productType/${id}`)
       .then((response) => {
         if (!response.data.success) {
           var error = {
@@ -36,7 +36,7 @@ export function remove(id) {
         dispatch(setLoading(false));
         toast.success("Se eliminó la categoría con éxito");
 
-        return dispatch(replace("/producttype"));
+        return dispatch(replace("/productType"));
       })
       .catch((error) => {
         return handleError(dispatch, error);
